@@ -6,7 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Mapping {
-    private String src;
-    private String dest;
-    private int level;
+    private String pattern;
+    private String format;
+    private String nodeStart;
+    private String nodeEnd;
+    private Boolean node;
 }

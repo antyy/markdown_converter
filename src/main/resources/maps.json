@@ -1,47 +1,60 @@
 {
-  "version": "1.0.0",
+  "version": "1.true.true",
   "sourceFormat": "md",
   "targetFormat": "html",
   "mappings": [
     {
-      "src": "\\[(.+?)\\]\\((.+?)\\)",
-      "dest": "<a href=\"%2$s\">%1$s</a>",
-      "level": 1
+      "pattern": "\\[(.+?)\\]\\((.+?)\\)",
+      "format": "<a href=\"%2$s\">%1$s</a>",
+      "node": false
     },
     {
-      "src": "\\*\\*(.+?)\\*\\*",
-      "dest": "<b>%s</b>",
-      "level": 1
+      "pattern": "\\*\\*(.+?)\\*\\*",
+      "format": "<b>%s</b>",
+      "node": false
     },
     {
-      "src": "^#\\s(.+)",
-      "dest": "<h1>%s</h1>",
-      "level": 0
+      "pattern": "^#\\s(.+)",
+      "format": "<h1>%s</h1>",
+      "node": true
     },
     {
-      "src": "^##\\s(.+)",
-      "dest": "<h2>%s</h2>",
-      "level": 0
+      "pattern": "^##\\s(.+)",
+      "format": "<h2>%s</h2>",
+      "node": true
     },
     {
-      "src": "^###\\s(.+)",
-      "dest": "<h3>%s</h3>",
-      "level": 0
+      "pattern": "^###\\s(.+)",
+      "format": "<h3>%s</h3>",
+      "node": true
     },
     {
-      "src": "^####\\s(.+)",
-      "dest": "<h4>%s</h4>",
-      "level": 0
+      "pattern": "^####\\s(.+)",
+      "format": "<h4>%s</h4>",
+      "node": true
     },
     {
-      "src": "^#####\\s(.+)",
-      "dest": "<h5>%s</h5>",
-      "level": 0
+      "pattern": "^#####\\s(.+)",
+      "format": "<h5>%s</h5>",
+      "node": true
     },
     {
-      "src": "^######\\s(.+)",
-      "dest": "<h6>%s</h6>",
-      "level": 0
+      "pattern": "^######\\s(.+)",
+      "format": "<h6>%s</h6>",
+      "node": true
+    },
+    {
+      "pattern": "^\\*(.+)",
+      "format": "*%s",
+      "nodeStart": "<ul>",
+      "nodeEnd": "</ul>",
+      "node": true
+    },
+    {
+      "pattern": "^\\*(.+)",
+      "format": "<li>%s</li>",
+      "node": false
     }
+
   ]
 }

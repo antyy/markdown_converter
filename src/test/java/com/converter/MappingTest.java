@@ -21,7 +21,8 @@ public class MappingTest {
 
     @BeforeAll
     public static void setUp() {
-        mapper = new Mapper(new AppConfig().mapperConfig("src/main/resources/maps.json", new ObjectMapper()));
+        AppConfig appConfig = new AppConfig();
+        mapper = new Mapper(appConfig.mapperConfig("src/main/resources/maps.json", appConfig.objectMapper()));
     }
 
     @ParameterizedTest

@@ -1,6 +1,7 @@
 package com.converter.mapper;
 
 import com.converter.model.MapperConfig;
+import com.converter.model.Mapping;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -17,7 +18,7 @@ public class Mapper {
     private List<SingleUnitMapper> rootMappersList;
     private List<SingleUnitMapper> childMappersList;
 
-    record SingleUnitMapper(Pattern pattern, String format) {
+    record SingleUnitMapper(Pattern pattern, String format, String prefix, String suffix) {
     }
 
     public Mapper(MapperConfig config) {
@@ -27,13 +28,13 @@ public class Mapper {
     private void init(MapperConfig config) {
         this.rootMappersList = config.getMappings()
                 .stream()
-                .filter(t -> t.getLevel() == 0)
-                .map(t -> new SingleUnitMapper(Pattern.compile(t.getSrc()), t.getDest()))
+                .filter(Mapping::getNode)
+                .map(t -> new SingleUnitMapper(Pattern.compile(t.getPattern()), t.getFormat(), t.getNodeStart(), t.getNodeEnd()))
                 .toList();
         this.childMappersList = config.getMappings()
                 .stream()
-                .filter(t -> t.getLevel() == 1)
-                .map(t -> new SingleUnitMapper(Pattern.compile(t.getSrc()), t.getDest()))
+                .filter(t -> !t.getNode())
+                .map(t -> new SingleUnitMapper(Pattern.compile(t.getPattern()), t.getFormat(), t.getNodeStart(), t.getNodeEnd()))
                 .toList();
     }
 
@@ -49,49 +50,50 @@ public class Mapper {
              FileWriter fileWriter = new FileWriter(destFile);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)
         ) {
+            SingleUnitMapper paragraph = new SingleUnitMapper(null, "", "<p>", "</p>");
             String line;
             String prevLine = null;
-            boolean isParagraph = true;
-            boolean isParagraphStart = true;
-            boolean isParagraphEnd = false;
+            String nodeEnd = "";
 
             while ((line = bufferedReader.readLine()) != null) {
 
-                line = mapInline(line);
-
-                isParagraph = true;
-                String result = null;
+                String result = line;
+//                line = mapInline(line);
                 if (line.isEmpty()) {
-                    if (isParagraphEnd) {
-                        prevLine = prevLine.concat("</p>");
-                        isParagraphEnd = false;
-                        isParagraphStart = true;
-                        isParagraph = false;
+                    if (prevLine != null) {
+                        prevLine = prevLine.concat(nodeEnd);
+                        nodeEnd = "";
                     }
                     result = line;
                 } else {
+                    String nodePrefix = "";
+                    boolean nodeFound = false;
                     for (SingleUnitMapper mapper : rootMappersList) {
                         Matcher matcher = mapper.pattern.matcher(line);
                         if (matcher.find()) {
+                            nodeFound = true;
                             result = String.format(mapper.format, matcher.group(1));
-                            if (isParagraphEnd) {
-                                prevLine = prevLine.concat("</p>");
+                            if (!nodeEnd.equals(mapper.suffix()) && prevLine != null) {
+                                prevLine = prevLine.concat(nodeEnd);
+                                if (mapper.prefix() != null) {
+                                    nodePrefix = mapper.prefix();
+                                }
+                                nodeEnd = mapper.suffix() == null ? "" : mapper.suffix();
                             }
-                            isParagraph = false;
-                            isParagraphStart = true;
-                            isParagraphEnd = false;
                             break;
                         }
                     }
-                    if (isParagraph) {
-                        if (isParagraphStart) {
-                            result = "<p>".concat(line);
-                            isParagraphEnd = true;
-                            isParagraphStart = false;
-                        } else {
-                            result = line;
+                    result = mapInline(result);
+                    if (!nodeFound) {
+                        if (!nodeEnd.equals(paragraph.suffix())) {
+                            if (prevLine != null) {
+                                prevLine = prevLine.concat(nodeEnd);
+                            }
+                            nodePrefix = paragraph.prefix;
+                            nodeEnd = paragraph.suffix();
                         }
                     }
+                    result = nodePrefix.concat(result);
                 }
                 if (StringUtils.hasLength(prevLine)) {
                     bufferedWriter.write(prevLine);
@@ -99,9 +101,8 @@ public class Mapper {
                 }
                 prevLine = result;
             }
-            if (isParagraphEnd) {
-                prevLine = prevLine.concat("</p>");
-            }
+            prevLine = prevLine.concat(nodeEnd);
+
             bufferedWriter.write(prevLine);
             bufferedWriter.newLine();
         } catch (Exception e) {

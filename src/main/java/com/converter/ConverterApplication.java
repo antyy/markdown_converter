@@ -31,7 +31,7 @@ public class ConverterApplication {
 
     @EventListener
     public void execute(ContextRefreshedEvent event) {
-        mapper.convert("HELP.md", "target.HTML");
+        mapper.convert("HELP.md", "target.html");
 //        mapper.convert(source, target);
     }
 }
