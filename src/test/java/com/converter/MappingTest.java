@@ -1,8 +1,7 @@
 package com.converter;
 
 import com.converter.config.AppConfig;
-import com.converter.mapper.Mapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.converter.mapper.MarkdownToHtmlMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,12 +16,12 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MappingTest {
-    static Mapper mapper;
+    static MarkdownToHtmlMapper mapper;
 
     @BeforeAll
     public static void setUp() {
         AppConfig appConfig = new AppConfig();
-        mapper = new Mapper(appConfig.mapperConfig("src/main/resources/maps.json", appConfig.objectMapper()));
+        mapper = new MarkdownToHtmlMapper(appConfig.mapperConfig("src/main/resources/maps.json", appConfig.objectMapper()));
     }
 
     @ParameterizedTest
@@ -50,9 +49,10 @@ public class MappingTest {
     private static Stream<Arguments> provideStringsForIsBlank() {
         return Stream.of(
                 Arguments.of("src/test/resources/paragraphAndHeadings.md", "src/test/resources/paragraphAndHeadings.html", "Invalid headings and paragraph mapping"),
-                Arguments.of("src/test/resources/paragraph.md", "src/test/resources/paragraph.html", "Invalid links mapping"),
+                Arguments.of("src/test/resources/paragraph.md", "src/test/resources/paragraph.html", "Invalid links and paragraph mapping"),
                 Arguments.of("src/test/resources/links.md", "src/test/resources/links.html", "Invalid links mapping"),
                 Arguments.of("src/test/resources/multiHeading.md", "src/test/resources/multiHeading.html", "Invalid heading mapping"),
+                Arguments.of("src/test/resources/taskExample.md", "src/test/resources/taskExample.html", "Invalid task mapping"),
                 Arguments.of("src/test/resources/singleHeading.md", "src/test/resources/singleHeading.html", "Invalid heading mapping")
         );
     }

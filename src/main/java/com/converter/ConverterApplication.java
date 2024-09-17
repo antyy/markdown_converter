@@ -1,6 +1,6 @@
 package com.converter;
 
-import com.converter.mapper.Mapper;
+import com.converter.mapper.MarkdownToHtmlMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,7 +12,7 @@ import static java.util.Objects.nonNull;
 @SpringBootApplication
 public class ConverterApplication {
     @Autowired
-    private Mapper mapper;
+    private MarkdownToHtmlMapper mapper;
     private static String source;
     private static String target;
 
@@ -31,7 +31,6 @@ public class ConverterApplication {
 
     @EventListener
     public void execute(ContextRefreshedEvent event) {
-        mapper.convert("HELP.md", "target.html");
-//        mapper.convert(source, target);
+        mapper.convert(source, target);
     }
 }

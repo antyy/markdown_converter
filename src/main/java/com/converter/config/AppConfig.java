@@ -27,15 +27,14 @@ public class AppConfig {
     public MapperConfig mapperConfig(@Value("${mapper.config.file:}") String mapperConfigFile,
                                      ObjectMapper objectMapper) {
         try {
-            File configFile = null;
             if (StringUtils.hasLength(mapperConfigFile)) {
-                configFile = new File(mapperConfigFile);
+                File configFile = new File(mapperConfigFile);
                 if (!configFile.exists()) {
                     throw new RuntimeException(mapperConfigFile + " does not exist");
                 }
                 return objectMapper.readValue(configFile, MapperConfig.class);
             } else {
-                return objectMapper.readValue(new ClassPathResource("maps.json").getInputStream(), MapperConfig.class);
+                return objectMapper.readValue(new ClassPathResource(DEFAULT_CONFIG_RESOURCE).getInputStream(), MapperConfig.class);
             }
 
         } catch (IOException e) {
